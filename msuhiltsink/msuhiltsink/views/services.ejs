@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Services</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Medical Services</h1>
+
+        <table id="servicesTable" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Service Type</th>
+                    <th>Patient Name</th>
+                    <th>Doctor in Charge</th>
+                    <th>Medical Notes</th>
+                    <th>Vital Signs</th>
+                    <th>Medication</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% services.forEach(service => { %>
+                <tr>
+                    <td><%= service.id %></td>
+                    <td><%= service.date %></td>
+                    <td><%= service.serviceType %></td>
+                    <td><%= service.patientName %></td>
+                    <td><%= service.doctorInCharge %></td>
+                    <td><%= service.medicalNotes %></td>
+                    <td>
+                        BP: <%= service.bloodPressure %>, RR: <%= service.respiratoryRate %>, PR: <%= service.pulseRate %>, Temp: <%= service.temperature %>
+                    </td>
+                    <td><%= service.medication %></td>
+                    <td>
+                        <form action="/services/delete" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="<%= service.id %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                        <button class="btn btn-warning btn-sm" onclick="editService('<%= service.id %>')">Edit</button>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h2 class="mt-4">Add Medical Service</h2>
+        <form method="POST" action="/services/add" class="mb-5">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="date">Date</label>
+                    <input type="date" class="form-control" name="date" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="serviceType">Service Type</label>
+                    <select class="form-control" name="serviceType" required>
+                        <option value="Checkup">Checkup</option>
+                        <option value="Dental">Dental</option>
+                        <option value="Admission">Admission</option>
+                        <option value="Certificate">Certificate</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="patientName">Patient Name</label>
+                <input type="text" class="form-control" name="patientName" placeholder="Patient Name" required>
+            </div>
+            <div class="form-group">
+                <label for="doctorInCharge">Doctor In Charge</label>
+                <input type="text" class="form-control" name="doctorInCharge" placeholder="Doctor In Charge" required>
+            </div>
+            <div class="form-group">
+                <label for="medicalNotes">Medical Notes</label>
+                <textarea class="form-control" name="medicalNotes" placeholder="Medical Notes"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="bloodPressure">Blood Pressure</label>
+                    <input type="text" class="form-control" name="bloodPressure" placeholder="Blood Pressure">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="respiratoryRate">Respiratory Rate</label>
+                    <input type="text" class="form-control" name="respiratoryRate" placeholder="Respiratory Rate">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="pulseRate">Pulse Rate</label>
+                    <input type="text" class="form-control" name="pulseRate" placeholder="Pulse Rate">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="temperature">Temperature</label>
+                    <input type="text" class="form-control" name="temperature" placeholder="Temperature">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="medication">Medication</label>
+                <input type="text" class="form-control" name="medication" placeholder="Medication">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Service</button>
+            
+        </form>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#servicesTable').DataTable(); // Initialize DataTables
+        });
+        
+        function editService(id) {
+            window.location.href = '/services/edit/' + id; // Redirect to edit page
+        }
+    </script>
+</body>
+</html>

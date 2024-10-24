@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MSU HealthSync</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 220px;
+            background-color: #355E3B;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            padding: 15px;
+            text-align: left;
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .sidebar a:hover {
+            background-color: #4CAF50;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 20px;
+        }
+        .content h1 {
+            color: #333;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="https://mmc-enrollment.minsu.edu.ph/img/logo.png" alt="MSU Logo" class="img-fluid mb-3" style="padding-left: 15px;">
+        <a id="dashboard-link" href="#">Dashboard</a>
+        <a id="patients-link" href="#">Patient Records</a>
+        <a id="medicines-link" href="#">Medicine Inventory</a>
+        <a id="services-link" href="#">Medical Services</a>
+        <a id="history-link" href="#">History</a>
+    </div>
+
+    <!-- Main content area -->
+    <div class="content">
+        <div id="dynamic-content">
+            <h1>Welcome to MSU HealthSync</h1>
+            <p>This is the clinic management system for Mindoro State University.</p>
+        </div>
+        <footer>
+            &copy; 2024 Mindoro State University | All Rights Reserved
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle sidebar link clicks
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent page reload
+
+                    // Get the id of the clicked link
+                    const pageId = this.id;
+                    let url = '/';
+                    
+                    switch (pageId) {
+                        case 'dashboard-link':
+                            url = '/dashboard'; // Replace with the actual route for dashboard content
+                            break;
+                        case 'patients-link':
+                            url = '/patients'; // Replace with the actual route for patient records
+                            break;
+                        case 'medicines-link':
+                            url = '/medicines'; // Replace with the actual route for medicine inventory
+                            break;
+                        case 'services-link':
+                            url = '/services'; // Replace with the actual route for medical services
+                            break;
+                        case 'history-link':
+                            url = '/history'; // Replace with the actual route for history
+                            break;
+                    }
+
+                    // Load the content using fetch
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(data => {
+                            document.getElementById('dynamic-content').innerHTML = data;
+                        })
+                        .catch(error => {
+                            alert('Failed to load the content: ' + error.message);
+                        });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Inventory</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medicine Inventory</h1>
+        <table id="medicinesTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Record Level</th>
+                    <th>Expiry Date</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% medicines.forEach(medicine => { %>
+                    <tr>
+                        <td><%= medicine.id %></td>
+                        <td><%= medicine.name %></td>
+                        <td><%= medicine.quantity %></td>
+                        <td><%= medicine.recordLevel %></td>
+                        <td><%= medicine.expiryDate %></td>
+                        <td><%= medicine.category %></td>
+                        <td>
+                            <form action="/medicines/delete" method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<%= medicine.id %>">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                            <button onclick="editMedicine('<%= medicine.id %>')" class="btn btn-warning btn-sm">Edit</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h2>Add Medicine</h2>
+        <form method="POST" action="/medicines/add">
+            <div class="form-group">
+                <input type="text" class="form-control" name="name" placeholder="Medicine Name" required>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" name="quantity" placeholder="Quantity" required>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" name="recordLevel" placeholder="Record Level" required>
+            </div>
+            <div class="form-group">
+                <input type="date" class="form-control" name="expiryDate" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="category" placeholder="Category" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Medicine</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#medicinesTable').DataTable({
+                "searching": true // Enable the search function
+            });
+        });
+
+        function editMedicine(id) {
+            // Implement your edit logic here (e.g., redirecting to the edit page)
+            alert('Edit medicine with ID: ' + id);
+        }
+    </script>
+</body>
+</html>
