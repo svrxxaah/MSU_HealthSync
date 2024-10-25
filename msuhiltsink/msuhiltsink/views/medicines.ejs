@@ -8,27 +8,121 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <style>
         body {
-            background-color: #f4f4f9;
+            background-color: #e9f5f2;
             font-family: Arial, sans-serif;
         }
+
         .container {
-            margin-top: 20px;
+            margin-top: 40px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            color: #333;
+
+        h1, h2 {
+            text-align: center;
+            color: #28a745;
+            font-weight: bold;
         }
+
         table {
-            margin-top: 20px;
+            margin-top: 30px;
+        }
+
+        th {
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .btn-sm {
+            margin: 0 5px;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: black;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .form-group input, .form-group select {
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button[type="submit"] {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Medicine Inventory</h1>
-        <table id="medicinesTable" class="table table-striped table-bordered">
+       <table id="medicinesTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>School ID</th>
                     <th>Name</th>
                     <th>Quantity</th>
                     <th>Record Level</th>
@@ -40,18 +134,20 @@
             <tbody>
                 <% medicines.forEach(medicine => { %>
                     <tr>
-                        <td><%= medicine.id %></td>
+                        <td><%= medicine.schoolId %></td> 
                         <td><%= medicine.name %></td>
                         <td><%= medicine.quantity %></td>
                         <td><%= medicine.recordLevel %></td>
                         <td><%= medicine.expiryDate %></td>
                         <td><%= medicine.category %></td>
                         <td>
-                            <form action="/medicines/delete" method="POST" style="display:inline;">
-                                <input type="hidden" name="id" value="<%= medicine.id %>">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                            <button onclick="editMedicine('<%= medicine.id %>')" class="btn btn-warning btn-sm">Edit</button>
+                            <div class="action-buttons">
+                                <form action="/medicines/delete" method="POST" style="display:inline;">
+                                    <input type="hidden" name="schoolId" value="<%= medicine.schoolId %>">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                <button onclick="editMedicine('<%= medicine.schoolId %>')" class="btn btn-warning btn-sm">Edit</button>
+                            </div>
                         </td>
                     </tr>
                 <% }); %>
@@ -75,7 +171,7 @@
             <div class="form-group">
                 <input type="text" class="form-control" name="category" placeholder="Category" required>
             </div>
-            <button type="submit" class="btn btn-primary">Add Medicine</button>
+            <button type="submit" class="btn btn-success">Add Medicine</button>
         </form>
     </div>
 
@@ -88,9 +184,8 @@
             });
         });
 
-        function editMedicine(id) {
-            // Implement your edit logic here (e.g., redirecting to the edit page)
-            alert('Edit medicine with ID: ' + id);
+        function editMedicine(schoolId) {
+            alert('Edit medicine with School ID: ' + schoolId);
         }
     </script>
 </body>
