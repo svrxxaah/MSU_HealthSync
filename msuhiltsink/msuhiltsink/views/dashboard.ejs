@@ -50,71 +50,71 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <img src="https://mmc-enrollment.minsu.edu.ph/img/logo.png" alt="MSU Logo" class="img-fluid mb-3" style="padding-left: 15px;">
-        <a id="dashboard-link" href="#">Dashboard</a>
-        <a id="patients-link" href="#">Patient Records</a>
-        <a id="medicines-link" href="#">Medicine Inventory</a>
-        <a id="services-link" href="#">Medical Services</a>
-        <a id="history-link" href="#">History</a>
+        <a id="patients-link" href="">Patient Records</a>
+        <a id="medicines-link" href="">Medicine Inventory</a>
+        <a id="services-link" href="">Medical Services</a>
+        <a id="history-link" href="">History</a>
     </div>
 
     <!-- Main content area -->
     <div class="content">
         <div id="dynamic-content">
-            <h1>Welcome to MSU HealthSync</h1>
-            <p>This is the clinic management system for Mindoro State University.</p>
         </div>
-        <footer>
-            &copy; 2024 Mindoro State University | All Rights Reserved
-        </footer>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            let currentPageId = ''; // Track the current page (no initial page)
+
             // Handle sidebar link clicks
             const links = document.querySelectorAll('.sidebar a');
             links.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent page reload
+                    e.preventDefault(); // Prevent default link behavior
 
                     // Get the id of the clicked link
                     const pageId = this.id;
-                    let url = '/';
-                    
+
+                    // If the user clicks the same link, do nothing
+                    if (pageId === currentPageId) {
+                        return;
+                    }
+
+                    let url = ''; // URL to fetch the content
+
                     switch (pageId) {
-                        case 'dashboard-link':
-                            url = '/dashboard'; // Replace with the actual route for dashboard content
-                            break;
                         case 'patients-link':
-                            url = '/patients'; // Replace with the actual route for patient records
+                            url = '/patients'; // Endpoint for patient records content
                             break;
                         case 'medicines-link':
-                            url = '/medicines'; // Replace with the actual route for medicine inventory
+                            url = '/medicines'; // Endpoint for medicine inventory content
                             break;
                         case 'services-link':
-                            url = '/services'; // Replace with the actual route for medical services
+                            url = '/services'; // Endpoint for medical services content
                             break;
                         case 'history-link':
-                            url = '/history'; // Replace with the actual route for history
+                            url = '/history'; // Endpoint for history content
                             break;
                     }
 
-                    // Load the content using fetch
+                    // Fetch the content from the server using the corresponding URL
                     fetch(url)
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
+                                throw new Error('Failed to load the content');
                             }
-                            return response.text();
+                            return response.text(); // Read the response as text
                         })
                         .then(data => {
-                            document.getElementById('dynamic-content').innerHTML = data;
+                            document.getElementById('dynamic-content').innerHTML = data; // Update the content area
+                            currentPageId = pageId; // Update the current page id
                         })
                         .catch(error => {
-                            alert('Failed to load the content: ' + error.message);
+                            alert('Error: ' + error.message); // Display any error that occurs
                         });
                 });
             });
         });
-    </script>
+    </script>    
 </body>
 </html>
