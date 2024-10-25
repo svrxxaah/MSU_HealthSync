@@ -4,7 +4,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'minsu'
+  database: 'msu_healthsync'
 });
 
 db.connect(err => {
