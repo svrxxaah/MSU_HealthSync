@@ -8,7 +8,20 @@ exports.getPatients = (req, res) => {
 };
 
 exports.addPatient = (req, res) => {
-  const patientData = req.body;
+  const patientData = {
+    fullName: req.body.fullName,
+    parent: req.body.parent,
+    schoolID:req.body.schoolID,
+    contact: req.body.contact,
+    address: req.body.address,
+    height: req.body.height,
+    weight: req.body.weight,
+    bloodType: req.body.bloodType,
+    medicalHistory: req.body.medicalHistory,
+    department: req.body.department, // Capture department
+    createdAt: new Date() // Optionally add createdAt
+  };
+
   Patient.create(patientData, (err) => {
     if (err) throw err;
     res.redirect('/patients');
@@ -17,7 +30,19 @@ exports.addPatient = (req, res) => {
 
 exports.updatePatient = (req, res) => {
   const { id } = req.params;
-  const patientData = req.body;
+  const patientData = {
+    fullName: req.body.fullName,
+    parent: req.body.parent,
+    schoolID:req.body.schoolID,
+    contact: req.body.contact,
+    address: req.body.address,
+    height: req.body.height,
+    weight: req.body.weight,
+    bloodType: req.body.bloodType,
+    medicalHistory: req.body.medicalHistory,
+    department: req.body.department // Ensure department is updated
+  };
+
   Patient.update(id, patientData, (err) => {
     if (err) throw err;
     res.redirect('/patients');
