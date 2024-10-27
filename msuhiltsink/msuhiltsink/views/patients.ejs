@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Records</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
     <style>
         body {
             background-color: #f0f4f8;
         }
-
         .container {
             margin-top: 40px;
             background-color: #ffffff;
@@ -17,65 +20,43 @@
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
         h1, h2.form-title {
             text-align: center;
             color: #28a745;
             font-weight: bold;
         }
-
         th {
             background-color: #28a745;
             color: white;
         }
-
         td, th {
             text-align: center;
         }
-
         .btn-green {
             background-color: #28a745;
             border-color: #28a745;
             color: white;
         }
-
         .btn-green:hover {
             background-color: #218838;
             border-color: #218838;
         }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px; /* Space between buttons */
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            .btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
+        .modal-content {
+            border-radius: 8px; /* Rounded corners */
+            padding: 20px; /* Inner spacing */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Patient Records</h1>
-        <table class="table table-striped table-bordered">
+        <table id="patientsTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>School ID</th>
                     <th>Full Name</th>
-                    <th>Department</th>
-                    <th>Parent/Guardian</th>
+                    <th>Course</th>
+                    <th>Parent or Guardian</th>
                     <th>Contact</th>
                     <th>Address</th>
                     <th>Height</th>
@@ -103,7 +84,13 @@
                                 <input type="hidden" name="id" value="<%= patient.id %>">
                                 <button type="submit" class="btn btn-green btn-sm">Delete</button>
                             </form>
-                            <button onclick="editPatient('<%= patient.id %>')" class="btn btn-green btn-sm">Edit</button>
+                            <button 
+                                class="btn btn-green btn-sm" 
+                                data-toggle="modal" 
+                                data-target="#editPatientModal"
+                                data-patient='{"ID": "<%= patient.id %>","schoolID": "<%= patient.schoolID %>", "fullName": "<%= patient.fullName %>", "department": "<%= patient.department %>", "parent": "<%= patient.parent %>", "contact": "<%= patient.contact %>", "address": "<%= patient.address %>", "height": "<%= patient.height %>", "weight": "<%= patient.weight %>", "bloodType": "<%= patient.bloodType %>", "medicalHistory": "<%= patient.medicalHistory %>"}'>
+                                Edit
+                            </button>
                         </td>
                     </tr>
                 <% }); %>
@@ -124,9 +111,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="department">Department</label>
+                    <label for="department">Course</label>
                     <select class="form-control" name="department" required>
-                        <option value="" disabled selected>Select Department</option>
+                        <option value="" disabled selected>Select Course</option>
                         <option value="BSIT">BSIT</option>
                         <option value="Dentistry">Dentistry</option>
                         <option value="Pharmacy">Pharmacy</option>
@@ -174,17 +161,118 @@
             </div>
             <div class="form-group">
                 <label for="medicalHistory">Medical History</label>
-                <textarea class="form-control" name="medicalHistory" placeholder="Medical History" rows="3"></textarea>
+                <textarea class="form-control" name="medicalHistory" rows="3" placeholder="Medical History"></textarea>
             </div>
-            <button type="submit" class="btn btn-green">Add Patient</button>
+            <button type="submit" class="btn btn-green btn-block">Add Patient</button>
         </form>
-        
+    </div>
+
+    <!-- Edit Patient Modal -->
+    <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 900px;"> <!-- Wider modal -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPatientModalLabel">Edit Patient</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPatientForm" method="POST" action="/patients/update">
+                        <input type="hidden" name="id" id="editPatientID">
+                        <div class="form-row"> <!-- Added form-row for better layout -->
+                            <div class="form-group col-md-4">
+                                <label for="editSchoolID">School ID</label>
+                                <input type="text" class="form-control" name="schoolID" id="editSchoolID" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editFullName">Full Name</label>
+                                <input type="text" class="form-control" name="fullName" id="editFullName" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editDepartment">Department</label>
+                                <select class="form-control" name="department" id="editDepartment" required>
+                                    <option value="" disabled>Select Course</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="Dentistry">Dentistry</option>
+                                    <option value="Pharmacy">Pharmacy</option>
+                                    <option value="Radiology">Radiology</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="editParent">Parent</label>
+                                <input type="text" class="form-control" name="parent" id="editParent" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editContact">Contact</label>
+                                <input type="text" class="form-control" name="contact" id="editContact" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editAddress">Address</label>
+                                <input type="text" class="form-control" name="address" id="editAddress" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="editHeight">Height</label>
+                                <input type="text" class="form-control" name="height" id="editHeight" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editWeight">Weight</label>
+                                <input type="text" class="form-control" name="weight" id="editWeight" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="editBloodType">Blood Type</label>
+                                <select class="form-control" name="bloodType" id="editBloodType" required>
+                                    <option value="" disabled>Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMedicalHistory">Medical History</label>
+                            <textarea class="form-control" name="medicalHistory" id="editMedicalHistory" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-green btn-block">Update Patient</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        function editPatient(id) {
-            alert('Edit patient with ID: ' + id);
-        }
+        $(document).ready(function() {
+            $('#patientsTable').DataTable(); // Initialize DataTable
+
+            // Populate modal with patient data for editing
+            $('#editPatientModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var patientData = button.data('patient'); // Extract info from data-* attributes
+
+                // Populate the fields in the modal
+                var modal = $(this);
+                modal.find('#editPatientID').val(patientData.ID);
+                modal.find('#editSchoolID').val(patientData.schoolID);
+                modal.find('#editFullName').val(patientData.fullName);
+                modal.find('#editDepartment').val(patientData.department);
+                modal.find('#editParent').val(patientData.parent);
+                modal.find('#editContact').val(patientData.contact);
+                modal.find('#editAddress').val(patientData.address);
+                modal.find('#editHeight').val(patientData.height);
+                modal.find('#editWeight').val(patientData.weight);
+                modal.find('#editBloodType').val(patientData.bloodType);
+                modal.find('#editMedicalHistory').val(patientData.medicalHistory);
+            });
+        });
     </script>
 </body>
 </html>
