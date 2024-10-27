@@ -1,15 +1,13 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise'); // Ensure to use mysql2/promise
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'msu_healthsync'
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'msu_healthsync',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect(err => {
-  if (err) throw err;
-  console.log('Database connected!');
-});
-
-module.exports = db;
+module.exports = pool;
