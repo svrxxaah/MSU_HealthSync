@@ -68,11 +68,25 @@
         <div id="dynamic-content">
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentPageId = ''; // Track the current page (no initial page)
             
+            // Show specific table based on dropdown selection
+            function showTable(selectedTable) {
+                $('#medicinesTableContainer').hide();
+                $('#patientsTableContainer').hide();
+                $('#servicesTableContainer').hide();
+                
+                if (selectedTable === 'medicines') {
+                    $('#medicinesTableContainer').show();
+                } else if (selectedTable === 'patients') {
+                    $('#patientsTableContainer').show();
+                } else if (selectedTable === 'services') {
+                    $('#servicesTableContainer').show();
+                }
+            }
+    
             // Handle sidebar link clicks
             const links = document.querySelectorAll('.sidebar a');
             links.forEach(link => {
@@ -91,68 +105,56 @@
             
                     switch (pageId) {
                         case 'dashboard-link':
-                            url = '/dashboard'; // Endpoint for dashboard content
+                            url = '/dashboard';
                             break;
                         case 'patients-link':
-                            url = '/patients'; // Endpoint for patient records content
+                            url = '/patients';
                             break;
                         case 'medicines-link':
-                            url = '/medicines'; // Endpoint for medicine inventory content
+                            url = '/medicines';
                             break;
                         case 'services-link':
-                            url = '/services'; // Endpoint for medical services content
+                            url = '/services';
                             break;
                         case 'history-link':
-                            url = '/history'; // Endpoint for history content
+                            url = '/history';
                             break;
                     }
             
-                    // Fetch the content from the server using the corresponding URL
                     fetch(url)
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Failed to load the content');
                             }
-                            return response.text(); // Read the response as text
+                            return response.text();
                         })
                         .then(data => {
-                            document.getElementById('dynamic-content').innerHTML = data; // Update the content area
-                            currentPageId = pageId; // Update the current page id
+                            document.getElementById('dynamic-content').innerHTML = data;
+                            currentPageId = pageId;
                         
-                            // Re-initialize DataTables after the new content is loaded
+                            // Run the additional setup based on the loaded content
                             if (pageId === 'history-link') {
-                                const medicinesTableEl = $('#medicinesTable');
-                                if ($.fn.DataTable.isDataTable(medicinesTableEl)) {
-                                    medicinesTableEl.DataTable().destroy(); // Destroy if exists
-                                }
-                                medicinesTableEl.DataTable({
-                                    "searching": true // Enable the search function
-                                });
-                            } else if (pageId === 'patients-link') {
-                                const patientsTableEl = $('#patientsTable');
-                                if ($.fn.DataTable.isDataTable(patientsTableEl)) {
-                                    patientsTableEl.DataTable().destroy(); // Destroy if exists
-                                }
-                                patientsTableEl.DataTable({
-                                    "searching": true // Enable the search function
-                                });
-                            } else if (pageId === 'services-link') {
-                                const servicesTableEl = $('#servicesTable');
-                                if ($.fn.DataTable.isDataTable(servicesTableEl)) {
-                                    servicesTableEl.DataTable().destroy(); // Destroy if exists
-                                }
-                                servicesTableEl.DataTable({
-                                    "searching": true // Enable the search function
+                                // Initialize DataTables for each table in history page
+                                $('#medicinesTable').DataTable();
+                                $('#patientsTable').DataTable();
+                                $('#servicesTable').DataTable();
+                                
+                                // Set default to medicines and showTable function
+                                showTable('medicines'); 
+                                
+                                // Event listener for table dropdown
+                                document.getElementById('tableSelect').addEventListener('change', function() {
+                                    showTable(this.value);
                                 });
                             }
                         })
                         .catch(error => {
-                            alert('Error: ' + error.message); // Display any error that occurs
+                            alert('Error: ' + error.message); 
                         });
                 });
             });
         });
-        
-    </script>     
+    </script>
+       
 </body>
 </html>
