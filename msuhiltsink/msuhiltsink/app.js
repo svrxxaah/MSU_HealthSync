@@ -129,6 +129,128 @@ app.post('/patients/delete', async (req, res) => {
     }
 });
 
+// Route to get all medicines and render the medicines page
+app.get('/medicines', async (req, res) => {
+    try {
+        const medicines = await Medicine.getAll(); // Fetch all medicines
+        res.render('medicines', { medicines }); // Render the medicines view
+    } catch (err) {
+        console.error('Error fetching medicines:', err);
+        res.status(500).send('Error fetching medicines');
+    }
+});
+
+// Route to handle adding a new medicine
+app.post('/medicines/add', async (req, res) => {
+    const medicineData = req.body;
+    
+    try {
+        await Medicine.create(medicineData);
+        res.redirect('/medicines'); // Redirect back to the medicines list
+    } catch (err) {
+        console.error('Error adding medicine:', err);
+        res.status(500).send('Error adding medicine');
+    }
+});
+
+// Route to handle updating a medicine
+app.post('/medicines/update/:id', async (req, res) => {
+    const { id } = req.params;
+    const medicineData = req.body;
+
+    try {
+        await Medicine.update(id, medicineData);
+        res.redirect('/medicines'); // Redirect back to the medicines list
+    } catch (err) {
+        console.error('Error updating medicine:', err);
+        res.status(500).send('Error updating medicine');
+    }
+});
+
+// Route to handle deleting a medicine
+app.post('/medicines/delete/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await Medicine.delete(id);
+        res.redirect('/medicines'); // Redirect back to the medicines list
+    } catch (err) {
+        console.error('Error deleting medicine:', err);
+        res.status(500).send('Error deleting medicine');
+    }
+});
+
+// Route to get all services and render the services page
+app.get('/services', async (req, res) => {
+    try {
+        const services = await Service.getAll(); // Fetch all services
+        res.render('services', { services }); // Render the services view
+    } catch (err) {
+        console.error('Error fetching services:', err);
+        res.status(500).send('Error fetching services');
+    }
+});
+
+// Route to handle adding a new service
+app.post('/services/add', async (req, res) => {
+    const serviceData = req.body;
+
+    try {
+        await Service.create(serviceData);
+        res.redirect('/services'); // Redirect back to the services list
+    } catch (err) {
+        console.error('Error adding service:', err);
+        res.status(500).send('Error adding service');
+    }
+});
+
+// Route to handle updating a service
+app.post('/services/update/:id', async (req, res) => {
+    const { id } = req.params;
+    const serviceData = req.body;
+
+    try {
+        await Service.update(id, serviceData);
+        res.redirect('/services'); // Redirect back to the services list
+    } catch (err) {
+        console.error('Error updating service:', err);
+        res.status(500).send('Error updating service');
+    }
+});
+
+// Route to handle deleting a service
+app.post('/services/delete/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await Service.delete(id);
+        res.redirect('/services'); // Redirect back to the services list
+    } catch (err) {
+        console.error('Error deleting service:', err);
+        res.status(500).send('Error deleting service');
+    }
+});
+
+// Add this route after your existing routes in app.js
+app.get('/history', async (req, res) => {
+    try {
+        // Fetch all records
+        const medicines = await Medicine.getAll(); // Fetch all medicines
+        const patients = await Patient.getAll(); // Fetch all patients
+        const services = await Service.getAll(); // Fetch all services
+
+        // Render the history view with the fetched data
+        res.render('history', { medicines, patients, services });
+    } catch (err) {
+        console.error('Error fetching history:', err);
+        res.status(500).send('Error fetching history');
+    }
+});
+
+
+
+
+
 // Mount route modules
 app.use('/admin', adminRoutes);
 app.use('/patients', patientRoutes);
