@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +18,6 @@
 
         .left-side {
             width: 50%;
-            background-image: url('your-image-url.jpg'); /* Add your image URL here */
             background-size: cover;
             background-position: center;
             height: 100vh;
@@ -104,12 +104,15 @@
         }
 
         @media (max-width: 768px) {
-            .left-side, .right-side {
+
+            .left-side,
+            .right-side {
                 width: 100%;
             }
 
             .left-side {
-                display: none; /* Hide image on mobile */
+                display: none;
+                /* Hide image on mobile */
             }
 
             .right-side {
@@ -121,12 +124,17 @@
             }
         }
     </style>
+      <script>
+        document.querySelector('.left-side').style.backgroundImage = "url('https://static.vecteezy.com/system/resources/previews/035/725/457/original/health-care-and-life-insurance-concept-vector.jpg')";
+      </script>    
 </head>
+
 <body>
 
     <!-- Left side with background image -->
-    <div class="left-side" style="background-image: url('images/')"></div>
-
+    <div class="left-side"
+        style="background-image: url('https://static.vecteezy.com/system/resources/previews/035/725/457/original/health-care-and-life-insurance-concept-vector.jpg');">
+    </div>
     <!-- Right side with login form inside a box -->
     <div class="right-side">
         <div class="login-box">
@@ -145,4 +153,5 @@
     </div>
 
 </body>
+
 </html>
