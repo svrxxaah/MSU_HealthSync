@@ -68,3 +68,14 @@ exports.deletePatient = async (req, res) => {
         res.status(500).send('Error deleting patient');
     }
 };
+// In patientController.js
+exports.getPatientHistory = async (req, res) => {
+    const { schoolID } = req.params;
+    try {
+        const results = await Patient.getBySchoolID(schoolID);
+        res.json(results); // Send back the patient records as JSON
+    } catch (err) {
+        console.error('Error fetching patient history:', err);
+        res.status(500).send('Error fetching patient history');
+    }
+};
