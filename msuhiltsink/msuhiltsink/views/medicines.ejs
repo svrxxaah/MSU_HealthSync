@@ -11,109 +11,7 @@
             background-color: #e9f5f2;
             font-family: Arial, sans-serif;
         }
-
-        .container {
-            margin-top: 40px;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        h1, h2 {
-            text-align: center;
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        table {
-            margin-top: 30px;
-        }
-
-        th {
-            background-color: #28a745;
-            color: white;
-            text-align: center;
-        }
-
-        td {
-            text-align: center;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .btn-sm {
-            margin: 0 5px;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #218838;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: black;
-        }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-            border-color: #d39e00;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-
-        .form-group input, .form-group select {
-            border-radius: 8px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        button[type="submit"] {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 8px;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #218838;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            .btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
-        }
+        /* Additional styles as needed */
     </style>
 </head>
 <body>
@@ -125,8 +23,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Quantity</th>
-                    <th>Record Level</th>
-                    <th>Expiry Date</th>
+                    <th>Date</th>
                     <th>Category</th>
                     <th>Actions</th>
                 </tr>
@@ -134,16 +31,16 @@
             <tbody>
                 <% medicines.forEach(medicine => { %>
                     <tr>
-                        <td><%= medicine.id %></td> 
+                        <td><%= medicine.id %></td>
                         <td><%= medicine.name %></td>
                         <td><%= medicine.quantity %></td>
-                        <td><%= medicine.recordLevel %></td>
                         <td><%= medicine.expiryDate %></td>
                         <td><%= medicine.category %></td>
                         <td>
                             <div class="action-buttons">
-                                <button onclick="confirmDelete('<%= medicine.id %>')" class="btn btn-danger btn-sm">Delete</button>
-                                <button onclick="openEditModal('<%= medicine.id %>', '<%= medicine.name %>', '<%= medicine.quantity %>',' <%= medicine.recordLevel %>', '<%= medicine.expiryDate %>', '<%= medicine.category %>')" class="btn btn-warning btn-sm">Edit</button>
+                                <button onclick="viewHistory('<%= medicine.category %>')" class="btn btn-success btn-sm">View</button>
+                                <button onclick="openEditModal('<%= medicine.id %>', '<%= medicine.name %>', '<%= medicine.quantity %>', '<%= medicine.expiryDate %>', '<%= medicine.category %>')" class="btn btn-warning btn-sm">Edit</button>
+                                <button onclick="openAddQuantityModal('<%= medicine.id %>', '<%= medicine.name %>', '<%= medicine.quantity %>')" class="btn btn-info btn-sm">Add Quantity</button>
                             </div>
                         </td>
                     </tr>
@@ -158,9 +55,6 @@
             </div>
             <div class="form-group">
                 <input type="number" class="form-control" name="quantity" placeholder="Quantity" required>
-            </div>
-            <div class="form-group">
-                <input type="number" class="form-control" name="recordLevel" placeholder="Record Level" required>
             </div>
             <div class="form-group">
                 <input type="date" class="form-control" name="expiryDate" required>
@@ -192,9 +86,6 @@
                             <input type="number" class="form-control" name="quantity" id="editMedicineQuantity" placeholder="Quantity" required>
                         </div>
                         <div class="form-group">
-                            <input type="number" class="form-control" name="recordLevel" id="editMedicineRecordLevel" placeholder="Record Level" required>
-                        </div>
-                        <div class="form-group">
                             <input type="date" class="form-control" name="expiryDate" id="editMedicineExpiryDate" required>
                         </div>
                         <div class="form-group">
@@ -207,24 +98,64 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <!-- View History Modal -->
+    <div class="modal fade" id="viewHistoryModal" tabindex="-1" role="dialog" aria-labelledby="viewHistoryModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                    <h5 class="modal-title" id="viewHistoryModalLabel">Medicines in Category</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this medicine?
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Content will be populated via JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <form id="deleteForm" action="/medicines/delete" method="POST" style="display: inline;">
-                        <input type="hidden" name="id" id="deleteMedicineId">
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quantity Modal -->
+    <div class="modal fade" id="addQuantityModal" tabindex="-1" role="dialog" aria-labelledby="addQuantityModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addQuantityModalLabel">Add Quantity</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addQuantityForm" method="POST" action="/medicines/add-quantity">
+                        <input type="hidden" name="id" id="addMedicineId">
+                        <div class="form-group">
+                            <label for="addMedicineName">Medicine Name</label>
+                            <input type="text" class="form-control" name="name" id="addMedicineName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="addMedicineCurrentQuantity">Current Quantity</label>
+                            <input type="number" class="form-control" name="currentQuantity" id="addMedicineCurrentQuantity" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="addNewQuantity">Quantity to Add</label>
+                            <input type="number" class="form-control" name="quantity" id="addNewQuantity" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Quantity</button>
                     </form>
                 </div>
             </div>
@@ -232,26 +163,56 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#medicinesTable').DataTable();
         });
 
-        function openEditModal(id, name, quantity, recordLevel, expiryDate, category) {
+        const medicines = <%- JSON.stringify(medicines) %>; // HAYAAN NA PULA ITO PARA GUMANA SI MODAL
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0]; // Returns 'YYYY-MM-DD'
+        }
+
+        function openEditModal(id, name, quantity, expiryDate, category) {
             $('#editMedicineId').val(id);
             $('#editMedicineName').val(name);
             $('#editMedicineQuantity').val(quantity);
-            $('#editMedicineRecordLevel').val(recordLevel);
-            $('#editMedicineExpiryDate').val(expiryDate);
+            $('#editMedicineExpiryDate').val(formatDate(expiryDate));
             $('#editMedicineCategory').val(category);
             $('#editMedicineModal').modal('show');
         }
 
-        function confirmDelete(id) {
-            $('#deleteMedicineId').val(id);
-            $('#deleteConfirmationModal').modal('show');
+        function viewHistory(category) {
+            const categoryMedicines = medicines.filter(medicine => medicine.category === category);
+            const historyTableBody = $('#historyTableBody');
+            historyTableBody.empty();
+            if (categoryMedicines.length > 0) {
+                categoryMedicines.forEach(medicine => {
+                    historyTableBody.append(`
+                                               <tr>
+                            <td>${medicine.id}</td>
+                            <td>${medicine.name}</td>
+                            <td>${medicine.quantity}</td>
+                            <td>${formatDate(medicine.expiryDate)}</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                historyTableBody.append('<tr><td colspan="4">No medicines found in this category.</td></tr>');
+            }
+            $('#viewHistoryModal').modal('show');
+        }
+
+        function openAddQuantityModal(id, name, currentQuantity) {
+            $('#addMedicineId').val(id);
+            $('#addMedicineName').val(name);
+            $('#addMedicineCurrentQuantity').val(currentQuantity);
+            $('#addQuantityModal').modal('show');
         }
     </script>
 </body>
