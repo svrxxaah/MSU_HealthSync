@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Services</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
     <style>
         body {
             background-color: #f8f9fa;
@@ -46,18 +46,15 @@
                     </td>
                     <td><%= service.medication %></td>
                     <td>
-                        <form action="/services/delete" method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<%= service.id %>">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                        <button class="btn btn-warning btn-sm" onclick="editService('<%= service.id %>')">Edit</button>
+                        <button class="btn btn-info btn-sm" onclick="viewServiceDetails('<%= service.serviceType %>')">View</button>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal('<%= service.id %>', '<%= service.date %>', '<%= service.serviceType %>', '<%= service.patientName %>', '<%= service.doctorInCharge %>', '<%= service.medicalNotes %>', '<%= service.bloodPressure %>', '<%= service.respiratoryRate %>', '<%= service.pulseRate %>', '<%= service.temperature %>', '<%= service.medication %>')">Edit</button>
                     </td>
                 </tr>
                 <% }); %>
             </tbody>
-        </table> 
+        </table>
 
-        <h2 class="mt-4">Medical Service</h2>
+        <h2 class="mt-4">Add Medical Service</h2>
         <form method="POST" action="/services/add" class="mb-5">
             <div class="form-row">
                 <div class="form-group col-md-6">
@@ -109,22 +106,212 @@
                 <input type="text" class="form-control" name="medication" placeholder="Medication">
             </div>
             <button type="submit" class="btn btn-primary">Add Service</button>
-            
         </form>
     </div>
+<!-- View Service Modal -->
+<div class="modal fade" id="viewServiceModal" tabindex="-1" role="dialog" aria-labelledby="viewServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> <!-- Use modal-lg for a larger modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewServiceModalLabel">Service Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="serviceDetailsBody">
+                        <!-- Dynamic content will be injected here -->
+                        <tr>
+                            <td>Service Name</td>
+                            <td id="serviceName">Example Service</td>
+                        </tr>
+                        <tr>
+                            <td>Description</td>
+                            <td id="serviceDescription">This is a detailed description of the service.</td>
+                        </tr>
+                        <tr>
+                            <td>Price</td>
+                            <td id="servicePrice">$100</td>
+                        </tr>
+                        <tr>
+                            <td>Duration</td>
+                            <td id="serviceDuration">30 minutes</td>
+                        </tr>
+                        <tr>
+                            <td>Provider</td>
+                            <td id="serviceProvider">Dr. John Doe</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+    <!-- Edit Service Modal -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1" role="dialog" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editServiceModalLabel">Edit Medical Service</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editServiceForm">
+                        <input type="hidden" name="id" id="editServiceId">
+                        <div class="form-group">
+                            <label for="editDate">Date</label>
+                            <input type="date" class="form-control" name="date" id="editDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editServiceType">Service Type</label>
+                            <select class="form-control" name="serviceType" id="editServiceType" required>
+                                <option value="Checkup">Checkup</option>
+                                <option value="Dental">Dental</option>
+                                <option value="Admission">Admission</option>
+                                <option value="Certificate">Certificate</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPatientName">Patient Name</label>
+                            <input type="text" class="form-control" name="patientName" id="editPatientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDoctorInCharge">Doctor In Charge</label>
+                            <input type="text" class="form-control" name="doctorInCharge" id="editDoctorInCharge" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMedicalNotes">Medical Notes</label>
+                            <textarea class="form-control" name="medicalNotes" id="editMedicalNotes"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="editBloodPressure">Blood Pressure</label>
+                                <input type="text" class="form-control" name="bloodPressure" id="editBloodPressure">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="editRespiratoryRate">Respiratory Rate</label>
+                                <input type="text" class="form-control" name="respiratoryRate" id="editRespiratoryRate">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="editPulseRate">Pulse Rate</label>
+                                <input type="text" class="form-control" name="pulseRate" id="editPulseRate">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="editTemperature">Temperature</label>
+                                <input type="text" class="form-control" name="temperature" id="editTemperature">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMedication">Medication</label>
+                            <input type="text" class="form-control" name="medication" id="editMedication">
+                        </div>
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        $(document).ready(function() {
-            $('#servicesTable').DataTable(); // Initialize DataTables
-        });
-        
-        function editService(id) {
-            window.location.href = '/services/edit/' + id; // Redirect to edit page
+        // Simulated data for services
+        const services = <%- JSON.stringify(services) %>;// wag aalisin
+        // Function to view service details
+        function viewServiceDetails(serviceType) {
+            const filteredServices = services.filter(service => service.serviceType === serviceType);
+            const detailsBody = $('#serviceDetailsBody');
+            detailsBody.empty();
+
+            if (filteredServices.length > 0) {
+                let tableHtml = `
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Service Type</th>
+                            <th>Patient Name</th>
+                            <th>Doctor in Charge</th>
+                            <th>Medical Notes</th>
+                            <th>Vital Signs</th>
+                            <th>Medication</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                filteredServices.forEach(service => {
+                    tableHtml += `
+                        <tr>
+                            <td>${service.id}</td>
+                            <td>${service.date}</td>
+                            <td>${service.serviceType}</td>
+                            <td>${service.patientName}</td>
+                            <td>${service.doctorInCharge}</td>
+                            <td>${service.medicalNotes || 'N/A'}</td>
+                            <td>BP: ${service.bloodPressure || 'N/A'}, RR: ${service.respiratoryRate || 'N/A'}, PR: ${service.pulseRate || 'N/A'}, Temp: ${service.temperature || 'N/A'}</td>
+                            <td>${service.medication || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `
+                    </tbody>
+                </table>
+                `;
+                detailsBody.append(tableHtml);
+            } else {
+                detailsBody.append('<p>No services found for this type.</p>');
+            }
+            $('#viewServiceModal').modal('show');
         }
+
+        // Function to open the Edit Modal
+        function openEditModal(id, date, serviceType, patientName, doctorInCharge, medicalNotes, bloodPressure, respiratoryRate, pulseRate, temperature, medication) {
+            console.log("Opening modal with values:", { id, date, serviceType, patientName, doctorInCharge, medicalNotes, bloodPressure, respiratoryRate, pulseRate, temperature, medication });
+
+            $('#editServiceId').val(id);
+            $('#editDate').val(date);
+            $('#editServiceType').val(serviceType);
+            $('#editPatientName').val(patientName);
+            $('#editDoctorInCharge').val(doctorInCharge);
+            $('#editMedicalNotes').val(medicalNotes);
+            $('#editBloodPressure').val(bloodPressure);
+            $('#editRespiratoryRate').val(respiratoryRate);
+            $('#editPulseRate').val(pulseRate);
+            $('#editTemperature').val(temperature);
+            $('#editMedication').val(medication);
+            
+            $('#editServiceModal').modal('show');
+        }
+
+        // AJAX submission for Edit Service Form
+        $('#editServiceForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            $.ajax({
+                type: 'POST',
+                url: '/services/edit',
+                data: $(this).serialize(), // Serialize the form data
+                success: function(response) {
+                    console.log("Service updated successfully:", response);
+                    $('#editServiceModal').modal('hide'); // Hide the modal after success
+                    // Optionally, refresh the services table or update the displayed data
+                    location.reload(); // Reload to see changes
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error updating service:", error);
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
