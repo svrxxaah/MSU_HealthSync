@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
 const Medicine = require('./models/Medicine'); // Adjust the path if necessary
 const Patient = require('./models/Patient');
 const Service = require('./models/Service');
+const pool = require('./config/db');
 const app = express();
 
 // Set EJS as the template engine
@@ -93,7 +94,7 @@ app.post('/patients/update', async (req, res) => {
     try {
         console.log('Updating patient with ID:', id);
         console.log('New patient data:', {
-            schoolID, fullName, department, parent, contact, address, height, weight, bloodType, medicalHistory 
+            id, schoolID, fullName, department, parent, contact, address, height, weight, bloodType, medicalHistory 
         });
 
         await Patient.update(id, { 
@@ -204,19 +205,39 @@ app.post('/services/add', async (req, res) => {
     }
 });
 
-// Route to handle updating a service
-app.post('/services/update/:id', async (req, res) => {
-    const { id } = req.params;
-    const serviceData = req.body;
+app.post('/services/edit', async (req, res) => {
+    const { id, date, serviceType, patientName, doctorInCharge, medicalNotes, bloodPressure, respiratoryRate, pulseRate, temperature, medication } = req.body;
 
     try {
-        await Service.update(id, serviceData);
-        res.redirect('/services'); // Redirect back to the services list
-    } catch (err) {
-        console.error('Error updating service:', err);
-        res.status(500).send('Error updating service');
+        const [result] = await pool.query(
+            `UPDATE services SET 
+            date = ?, 
+            serviceType = ?, 
+            patientName = ?, 
+            doctorInCharge = ?, 
+            medicalNotes = ?, 
+            bloodPressure = ?, 
+            respiratoryRate = ?, 
+            pulseRate = ?, 
+            temperature = ?, 
+            medication = ? 
+            WHERE id = ?`,
+            [date, serviceType, patientName, doctorInCharge, medicalNotes, bloodPressure, respiratoryRate, pulseRate, temperature, medication, id]
+        );
+
+        if (result.affectedRows > 0) {
+            res.status(200).send('Service updated successfully');
+        } else {
+            res.status(404).send('Service not found');
+        }
+    } catch (error) {
+        console.error('Error updating service:', error);
+        res.status(500).send('An error occurred while updating the service');
     }
 });
+
+
+
 
 // Route to handle deleting a service
 app.post('/services/delete/:id', async (req, res) => {
@@ -240,7 +261,7 @@ app.get('/history', async (req, res) => {
         const services = await Service.getAll(); // Fetch all services
 
         // Render the history view with the fetched data
-        res.render('history', { medicines, patients, services });
+        res.render('history', { patients, medicines, services });
     } catch (err) {
         console.error('Error fetching history:', err);
         res.status(500).send('Error fetching history');
@@ -248,6 +269,30 @@ app.get('/history', async (req, res) => {
 });
 
 
+app.post('/medicines/add-quantity', async (req, res) => {
+    let connection;
+    try {
+        const { id, quantity } = req.body;
+
+        connection = await pool.getConnection();
+        
+        const [results] = await connection.query('SELECT * FROM medicines WHERE id = ?', [id]);
+
+        if (results.length > 0) {
+            const medicine = results[0];
+            const newQuantity = medicine.quantity + parseInt(quantity);
+            await connection.query('UPDATE medicines SET quantity = ? WHERE id = ?', [newQuantity, id]);
+            res.redirect('/medicines'); 
+        } else {
+            res.status(404).send('Medicine not found');
+        }
+    } catch (error) {
+        console.error('Error adding quantity:', error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        if (connection) connection.release();
+    }
+});
 
 
 
