@@ -23,12 +23,12 @@ exports.addMedicine = async (req, res) => {
 };
 
 exports.updateMedicine = async (req, res) => {
-    const { id } = req.params;
-    const medicineData = req.body;
+    const { id, name, expirydate, quantity, category } = req.body; // Adjust fields as needed
 
     try {
-        await Medicine.update(id, medicineData); // Using async/await
-        res.redirect('/medicines');
+        // Update the medicine in the database
+        await Medicine.update(id, { name, expirydate, quantity, category });
+        res.redirect('/medicines'); // Redirect back to the medicines list after updating
     } catch (err) {
         console.error('Error updating medicine:', err);
         res.status(500).send('Error updating medicine');
@@ -44,5 +44,16 @@ exports.deleteMedicine = async (req, res) => {
     } catch (err) {
         console.error('Error deleting medicine:', err);
         res.status(500).send('Error deleting medicine');
+    }
+};
+
+exports.getMedicinesByCategory = async (req, res) => {
+    const category = req.params.category;
+    try {
+        const medicines = await Medicine.findAll({ where: { category: category } });
+        res.json(medicines); // Return the medicines as JSON
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
     }
 };
