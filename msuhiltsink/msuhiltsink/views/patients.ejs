@@ -42,8 +42,8 @@
             border-color: #218838;
         }
         .modal-content {
-            border-radius: 8px; /* Rounded corners */
-            padding: 20px; /* Inner spacing */
+            border-radius: 8px;
+            padding: 20px;
         }
     </style>
 </head>
@@ -78,23 +78,28 @@
                         <td><%= patient.height %></td>
                         <td><%= patient.weight %></td>
                         <td><%= patient.bloodType %></td>
-                        <td><%= patient.medicalHistory %></td>
+                        <td><%= Array.isArray(patient.medicalHistory) ? patient.medicalHistory.join(', ') : 'No Medical History' %></td>
                         <td class="action-buttons">
-                            <form action="/patients/delete" method="POST" class="d-inline">
-                                <input type="hidden" name="id" value="<%= patient.id %>">
-                                <button type="submit" class="btn btn-green btn-sm">Delete</button>
-                            </form>
                             <button 
                                 class="btn btn-green btn-sm" 
                                 data-toggle="modal" 
-                                data-target="#editPatientModal"
-                                data-patient='{"ID": "<%= patient.id %>","schoolID": "<%= patient.schoolID %>", "fullName": "<%= patient.fullName %>", "department": "<%= patient.department %>", "parent": "<%= patient.parent %>", "contact": "<%= patient.contact %>", "address": "<%= patient.address %>", "height": "<%= patient.height %>", "weight": "<%= patient.weight %>", "bloodType": "<%= patient.bloodType %>", "medicalHistory": "<%= patient.medicalHistory %>"}'>
-                                Edit
+                                data-target="#viewHistoryModal"
+                                data-patient='{"ID": "<%= patient.id %>","schoolID": "<%= patient.schoolID %>", "fullName": "<%= patient.fullName %>", "department": "<%= patient.department %>", "parent": "<%= patient.parent %>", "contact": "<%= patient.contact %>", "address": "<%= patient.address %>", "height": "<%= patient.height %>", "weight": "<%= patient.weight %>", "bloodType": "<%= patient.bloodType %>", "medicalHistory": <%= JSON.stringify(patient.medicalHistory) %>}'>
+                                View
                             </button>
+                            <button 
+                            class="btn btn-green btn-sm" 
+                            data-toggle="modal" 
+                            data-target="#editPatientModal"
+                            data-patient='{"ID": "<%= patient.id %>","schoolID": "<%= patient.schoolID %>", "fullName": "<%= patient.fullName %>", "department": "<%= patient.department %>", "parent": "<%= patient.parent %>", "contact": "<%= patient.contact %>", "address": "<%= patient.address %>", "height": "<%= patient.height %>", "weight": "<%= patient.weight %>", "bloodType": "<%= patient.bloodType %>", "medicalHistory": <%= JSON.stringify(patient.medicalHistory) %>}' >
+                            Edit
+                        </button>
+                        
                         </td>
                     </tr>
                 <% }); %>
             </tbody>
+            
         </table>
 
         <h2 class="form-title">Add Patient</h2>
@@ -167,112 +172,197 @@
         </form>
     </div>
 
-    <!-- Edit Patient Modal -->
-    <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 900px;"> <!-- Wider modal -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editPatientModalLabel">Edit Patient</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editPatientForm" method="POST" action="/patients/update">
-                        <input type="hidden" name="id" id="editPatientID">
-                        <div class="form-row"> <!-- Added form-row for better layout -->
-                            <div class="form-group col-md-4">
-                                <label for="editSchoolID">School ID</label>
-                                <input type="text" class="form-control" name="schoolID" id="editSchoolID" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editFullName">Full Name</label>
-                                <input type="text" class="form-control" name="fullName" id="editFullName" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editDepartment">Department</label>
-                                <select class="form-control" name="department" id="editDepartment" required>
-                                    <option value="" disabled>Select Course</option>
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="Dentistry">Dentistry</option>
-                                    <option value="Pharmacy">Pharmacy</option>
-                                    <option value="Radiology">Radiology</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label for="editParent">Parent</label>
-                                <input type="text" class="form-control" name="parent" id="editParent" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editContact">Contact</label>
-                                <input type="text" class="form-control" name="contact" id="editContact" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editAddress">Address</label>
-                                <input type="text" class="form-control" name="address" id="editAddress" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label for="editHeight">Height</label>
-                                <input type="text" class="form-control" name="height" id="editHeight" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editWeight">Weight</label>
-                                <input type="text" class="form-control" name="weight" id="editWeight" required>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="editBloodType">Blood Type</label>
-                                <select class="form-control" name="bloodType" id="editBloodType" required>
-                                    <option value="" disabled>Select Blood Type</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editMedicalHistory">Medical History</label>
-                            <textarea class="form-control" name="medicalHistory" id="editMedicalHistory" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-green btn-block">Update Patient</button>
-                    </form>
+<!-- View Patient History Modal -->
+<div class="modal fade" id="viewHistoryModal" tabindex="-1" aria-labelledby="viewHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 95%;">
+        <div class="modal-content" style="overflow: hidden;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewHistoryModalLabel">Patient Medical History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 id="patientName"></h6>
+                <div style="overflow-x: auto;">
+                    <table class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>School ID</th>
+                                <th>Full Name</th>
+                                <th>Course</th>
+                                <th>Parent/Guardian</th>
+                                <th>Contact</th>
+                                <th>Address</th>
+                                <th>Height</th>
+                                <th>Weight</th>
+                                <th>Blood Type</th>
+                                <th>Medical History</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientHistoryBody">
+                            <!-- Patient details will be injected here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Edit Patient Modal -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 95%;">
+        <div class="modal-content" style="overflow: hidden;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPatientModalLabel">Edit Patient</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editPatientForm" method="POST" action="/patients/update">
+                <div class="modal-body">
+                    <input type="hidden" id="editID" name="id">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editFullName">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" name="fullName" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editSchoolID">School ID</label>
+                            <input type="text" class="form-control" id="editSchoolID" name="schoolID" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editDepartment">Course</label>
+                            <select class="form-control" id="editDepartment" name="department" required>
+                                <option value="" disabled>Select Course</option>
+                                <option value="BSIT">BSIT</option>
+                                <option value="Dentistry">Dentistry</option>
+                                <option value="Pharmacy">Pharmacy</option>
+                                <option value="Radiology">Radiology</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editParent">Parent/Guardian Name</label>
+                            <input type="text" class="form-control" id="editParent" name="parent" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editContact">Contact Number</label>
+                            <input type="text" class="form-control" id="editContact" name="contact" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editAddress">Address</label>
+                            <input type="text" class="form-control" id="editAddress" name="address" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="editHeight">Height (cm)</label>
+                            <input type="number" class="form-control" id="editHeight" name="height" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="editWeight">Weight (kg)</label>
+                            <input type="number" class="form-control" id="editWeight" name="weight" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="editBloodType">Blood Type</label>
+                            <select class="form-control" id="editBloodType" name="bloodType" required>
+                                <option value="" disabled>Select Blood Type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMedicalHistory">Medical History</label>
+                        <textarea class="form-control" id="editMedicalHistory" name="medicalHistory" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-green">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
 
     <script>
-        $(document).ready(function() {
-            $('#patientsTable').DataTable(); // Initialize DataTable
-
-            // Populate modal with patient data for editing
-            $('#editPatientModal').on('show.bs.modal', function(event) {
+        $(document).ready(function () {
+            $('#patientsTable').DataTable();
+            
+            // View Patient History
+            $('#viewHistoryModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget); // Button that triggered the modal
-                var patientData = button.data('patient'); // Extract info from data-* attributes
-
-                // Populate the fields in the modal
-                var modal = $(this);
-                modal.find('#editPatientID').val(patientData.ID);
-                modal.find('#editSchoolID').val(patientData.schoolID);
-                modal.find('#editFullName').val(patientData.fullName);
-                modal.find('#editDepartment').val(patientData.department);
-                modal.find('#editParent').val(patientData.parent);
-                modal.find('#editContact').val(patientData.contact);
-                modal.find('#editAddress').val(patientData.address);
-                modal.find('#editHeight').val(patientData.height);
-                modal.find('#editWeight').val(patientData.weight);
-                modal.find('#editBloodType').val(patientData.bloodType);
-                modal.find('#editMedicalHistory').val(patientData.medicalHistory);
+                var schoolID = button.data('patient').schoolID; // Extract School ID
+                
+                // Fetch records for this School ID
+                $.ajax({
+                    url: '/patients/history/' + schoolID, // Adjust URL to your new route
+                    method: 'GET',
+                    success: function (patients) {
+                        var modal = $('#viewHistoryModal');
+                        var historyBody = modal.find('#patientHistoryBody');
+                        historyBody.empty(); // Clear previous entries
+    
+                        // Populate the patient data into the modal's table
+                        patients.forEach(function(patient) {
+                            historyBody.append(`
+                                <tr>
+                                    <td>${patient.schoolID}</td>
+                                    <td>${patient.fullName}</td>
+                                    <td>${patient.department}</td>
+                                    <td>${patient.parent}</td>
+                                    <td>${patient.contact}</td>
+                                    <td>${patient.address}</td>
+                                    <td>${patient.height}</td>
+                                    <td>${patient.weight}</td>
+                                    <td>${patient.bloodType}</td>
+                                    <td>${Array.isArray(patient.medicalHistory) && patient.medicalHistory.length > 0 ? patient.medicalHistory.join(', ') : 'None'}</td>
+                                </tr>
+                            `);
+                        });
+                    },
+                    error: function () {
+                        alert('Error fetching patient history.');
+                    }
+                });
+            });
+    
+            // Edit Patient Modal
+            $('#editPatientModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var patient = button.data('patient'); // Extract patient data
+                
+                // Populate the modal fields
+                $('#editID').val(patient.ID);
+                $('#editFullName').val(patient.fullName);
+                $('#editSchoolID').val(patient.schoolID);
+                $('#editDepartment').val(patient.department);
+                $('#editParent').val(patient.parent);
+                $('#editContact').val(patient.contact);
+                $('#editAddress').val(patient.address);
+                $('#editHeight').val(patient.height);
+                $('#editWeight').val(patient.weight);
+                $('#editBloodType').val(patient.bloodType);
+                $('#editMedicalHistory').val(Array.isArray(patient.medicalHistory) ? patient.medicalHistory.join(', ') : '');
             });
         });
     </script>
+    
 </body>
 </html>
