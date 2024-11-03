@@ -55,107 +55,18 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <img src="https://mmc-enrollment.minsu.edu.ph/img/logo.png" alt="MSU Logo" class="img-fluid mb-3" style="padding-left: 15px;">
-        <a id="dashboard-link" href="">Dashboard</a>
-        <a id="patients-link" href="">Patient Records</a>
-        <a id="medicines-link" href="">Medicine Inventory</a>
-        <a id="services-link" href="">Medical Services</a>
-        <a id="history-link" href="">History</a>
+        <a href="">Dashboard</a>
+        <a href="/patients">Patient Records</a>
+        <a href="/medicines">Medicine Inventory</a>
+        <a href="/services">Medical Services</a>
+        <a href="/history">History</a>
     </div>
     
-
     <!-- Main content area -->
     <div class="content">
         <div id="dynamic-content">
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let currentPageId = ''; // Track the current page (no initial page)
-            
-            // Show specific table based on dropdown selection
-            function showTable(selectedTable) {
-                $('#medicinesTableContainer').hide();
-                $('#patientsTableContainer').hide();
-                $('#servicesTableContainer').hide();
-                
-                if (selectedTable === 'medicines') {
-                    $('#medicinesTableContainer').show();
-                } else if (selectedTable === 'patients') {
-                    $('#patientsTableContainer').show();
-                } else if (selectedTable === 'services') {
-                    $('#servicesTableContainer').show();
-                }
-            }
-    
-            // Handle sidebar link clicks
-            const links = document.querySelectorAll('.sidebar a');
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent default link behavior
-            
-                    // Get the id of the clicked link
-                    const pageId = this.id;
-            
-                    // If the user clicks the same link, do nothing
-                    if (pageId === currentPageId) {
-                        return;
-                    }
-            
-                    let url = ''; // URL to fetch the content
-            
-                    switch (pageId) {
-                        case 'dashboard-link':
-                            url = '/dashboard';
-                            break;
-                        case 'patients-link':
-                            url = '/patients';
-                            break;
-                        case 'medicines-link':
-                            url = '/medicines';
-                            break;
-                        case 'services-link':
-                            url = '/services';
-                            break;
-                        case 'history-link':
-                            url = '/history';
-                            break;
-                    }
-            
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to load the content');
-                            }
-                            return response.text();
-                        })
-                        .then(data => {
-                            document.getElementById('dynamic-content').innerHTML = data;
-                            currentPageId = pageId;
-                        
-                            // Run the additional setup based on the loaded content
-                            if (pageId === 'history-link') {
-                                // Initialize DataTables for each table in history page
-                                $('#medicinesTable').DataTable();
-                                $('#patientsTable').DataTable();
-                                $('#servicesTable').DataTable();
-                                
-                                // Set default to medicines and showTable function
-                                showTable('medicines'); 
-                                
-                                // Event listener for table dropdown
-                                document.getElementById('tableSelect').addEventListener('change', function() {
-                                    showTable(this.value);
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            alert('Error: ' + error.message); 
-                        });
-                });
-            });
-        });
-
-    </script>
        
 </body>
 </html>
